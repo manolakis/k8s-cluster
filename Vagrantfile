@@ -1,25 +1,25 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 VAGRANTFILE_API_VERSION = "2"
-NODES = 2
+NODES = 1
 
 require './vagrant-provision-reboot-plugin'
 
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
-  config.vm.box = "centos/7"
+  config.vm.box = "bento/ubuntu-18.04"
+  
   config.vm.provider "virtualbox" do |vb|
-    # vb.cpus = 2
+    vb.cpus = 2
     vb.memory = 2048
+    vb.linked_clone = true
   end
 
-  config.vm.provision :shell, :path => "common-preconfig.sh", :args => "#{NODES}"
-  config.vm.provision :unix_reboot
-  config.vm.provision :shell, :path => "common-postconfig.sh", :args => "#{NODES}"
+  config.vm.provision "docker"
+  config.vm.provision :shell, :path => "common-config.sh", :args => "#{NODES}"
 
   # master node
   config.vm.define :master, primary: true do |master|
     master.vm.network "private_network", ip: "10.0.15.10"
-    master.vm.network "forwarded_port", guest: 8001, host: 8001
     master.vm.hostname = "master"
     master.vm.provision :shell, :path => "master-config.sh", :privileged => false
   end

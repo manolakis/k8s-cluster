@@ -8,3 +8,6 @@ sudo chown $(id -u):$(id -g) $HOME/.kube/config
 
 # Install flannel CNI plugin
 kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
+
+# Allow pods to run on master node
+kubectl taint nodes --all node-role.kubernetes.io/master-
